@@ -1,0 +1,96 @@
+for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1; // ကြယ်အရွယ်အစား
+                star.style.width =
+${size}px
+;
+                star.style.height =
+${size}px
+;
+                
+                star.style.top =
+${Math.random() * 100}%
+;
+                star.style.left =
+${Math.random() * 100}%
+;
+                
+                const duration = Math.random() * 3 + 2; // တောက်ပမည့် အချိန်အဆ
+                star.style.setProperty('--duration',
+${duration}s
+);
+                
+                container.appendChild(star);
+            }
+        }
+
+        const MAX_LIMIT = 10000;
+        let count = 0;
+        const MONETAG_URL = 'https://uplcm.com/4/12290717';
+
+        // နေ့ရက်ပြောင်းသွားပါက ဒေတာကို ရှင်းလွှတ်ရန် (Reset Daily)
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastSavedDate = localStorage.getItem('last_saved_date');
+
+            if (lastSavedDate !== today) {
+                localStorage.setItem('last_saved_date', today);
+                localStorage.setItem('ad_count', 0);
+            }
+            
+            count = parseInt(localStorage.getItem('ad_count')) || 0;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('counterDisplay').innerText =
+${count} / ${MAX_LIMIT}
+;
+            if (count >= MAX_LIMIT) {
+                document.getElementById('watchBtn').innerText = 'ယနေ့အတွက် ပြီးဆုံးပါပြီ';
+                document.getElementById('watchBtn').disabled = true;
+            }
+        }
+
+        // ကြော်ငြာခလုတ်နှိပ်သည့်အခါ ၅ စက္ကန့်စောင့်ပြီးမှ Tab အသစ်ဖြင့် လင့်ခ်ဖွင့်မည်
+        function startAdTimer() {
+            if (count >= MAX_LIMIT) return;
+
+            const loader = document.getElementById('loader');
+            const countdownSpan = document.getElementById('countdown');
+            let timeLeft = 5;
+
+            loader.style.display = 'flex';
+            countdownSpan.innerText = timeLeft;
+
+            let timer = setInterval(() => {
+                timeLeft--;
+                countdownSpan.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    loader.style.display = 'none';
+
+                    // ၁။ ရေတွက်မှုကို ၁ တိုးမည်
+                    count++;
+                    localStorage.setItem('ad_count', count);
+                    localStorage.setItem('last_saved_date', new Date().toDateString());
+
+                    updateDisplay();
+
+                    // ၂။ ၅ စက္ကန့်ပြည့်မှ Monetag လင့်ခ်ကို Tab အသစ်ဖြင့် ဖွင့်မည်
+                    window.open(MONETAG_URL, '_blank');
+                }
+            }, 1000);
+        }
+
+        // စစချင်း ဖွင့်ချင်းမှာ ကြယ်များဖန်တီးရန်နှင့် ရက်စွဲစစ်ဆေးရန်
+        window.onload = function() {
+            createStars();
+            checkDailyReset();
+        };
+    </script>
+</body>
+</html>
